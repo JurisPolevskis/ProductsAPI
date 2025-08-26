@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddDbContext<IProductDBContext, ProductDBContext>(options => options.UseSqlServer(builder.Configuration["connectionStrings:DatabaseConnection"]));
 
 var app = builder.Build();

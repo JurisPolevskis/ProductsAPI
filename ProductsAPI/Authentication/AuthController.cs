@@ -6,33 +6,69 @@ namespace ProductsAPI.Authentication
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(IHashingService hashingService, IProductDBContext dbContext, ITokenService tokenService) : ControllerBase
     {
-        private readonly IHashingService hashingService;
-        private readonly IProductDBContext dbContext;
-
-        public AuthController(IHashingService hashingService, IProductDBContext dbContext)
-        {
-            this.hashingService = hashingService;
-            this.dbContext = dbContext;
-        }
+        private readonly IHashingService hashingService = hashingService;
+        private readonly IProductDBContext dbContext = dbContext;
 
         [HttpPost("create")]
         public IActionResult Create(Dtos.User user)
         {
-            if (!UsernameValid(user.UserName))
-                return BadRequest($"Invalid username: {user.UserName}");
+            if (!UsernameValid(user.Username))
+                return BadRequest($"Invalid username: {user.Username}");
 
             if (!PasswordValid(user.Password))
-                return BadRequest($"Invalid password");
+                return BadRequest($"Invalid password: {user.Password}");
 
             if (UserExists(user, dbContext))
                 return Conflict("User already exists");
 
-            InsertUser(user, dbContext, hashingService);
+            InsertUser(user);
             return Created("auth/create", user);
         }
 
+        [HttpPost("login")]
+        public IActionResult Login(Dtos.User user)
+        {
+            if (!UsernameValid(user.Username))
+                return BadRequest($"Invalid username: {user.Username}");
+
+            if (!PasswordValid(user.Password))
+                return BadRequest($"Invalid password: {user.Password}");
+
+            var validDbUser = GetValidUser(user);
+            if (validDbUser is null)
+                return BadRequest("Invalid username/password combination");
+
+
+            return new ObjectResult(tokenService.Generate(validDbUser));
+        }
+
+        private void InsertUser(Dtos.User user)
+        {
+            if (user.Username is null)
+                throw new ArgumentNullException(nameof(user), "user.UserName is null on insert when it should have been checked previously");
+            if (user.Password is null)
+                throw new ArgumentNullException(nameof(user), "user.Password is null on insert when it should have been checked previously");
+
+            var dbUser = new DbObjects.User
+            {
+                Username = user.Username,
+                Hash = hashingService.Hash(user.Password)
+            };
+            dbContext.Users.Add(dbUser);
+            dbContext.SaveChanges();
+        }
+
+        private DbObjects.User? GetValidUser(Dtos.User user)
+        {
+            var foundUser = dbContext.Users.FirstOrDefault(existingUser => user.Username == existingUser.Username);
+            if (foundUser is null || user.Password == null)
+                return null;
+            if (!hashingService.Verify(user.Password, foundUser.Hash))
+                return null;
+            return foundUser;
+        }
 
         private static bool PasswordValid(string? password)
         {
@@ -44,25 +80,9 @@ namespace ProductsAPI.Authentication
             return !string.IsNullOrEmpty(userName);
         }
 
-        private static void InsertUser(Dtos.User user, IProductDBContext dbContext, IHashingService hashingService)
-        {
-            if (user.UserName is null)
-                throw new ArgumentNullException(nameof(user), "user.UserName is null on insert when it should have been checked previously");
-            if (user.Password is null)
-                throw new ArgumentNullException(nameof(user), "user.Password is null on insert when it should have been checked previously");
-
-            var dbUser = new DbObjects.User
-            { 
-                Username = user.UserName,
-                Hash = hashingService.Hash(user.Password)
-            };
-            dbContext.Users.Add(dbUser);
-            dbContext.SaveChanges();
-        }
-
         private static bool UserExists(Dtos.User user, IProductDBContext dbContext)
         {
-            return dbContext.Users.Any(dbUser => user.UserName == dbUser.Username);
+            return dbContext.Users.Any(dbUser => user.Username == dbUser.Username);
         }
     }
 }
