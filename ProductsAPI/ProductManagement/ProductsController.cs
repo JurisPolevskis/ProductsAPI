@@ -36,7 +36,7 @@ namespace ProductsAPI.ProductManagement
             }
             var dbProduct = ToDb(product);
             productDBContext.Product.Add(dbProduct);
-            productDBContext.SaveChanges();
+            productDBContext.SaveChanges(HttpContext);
             return Created("products", ToDto(dbProduct));
         }
 
@@ -57,7 +57,7 @@ namespace ProductsAPI.ProductManagement
             dbProduct.Quantity = product.Quantity;
             dbProduct.Price = product.Price;
 
-            productDBContext.SaveChanges();
+            productDBContext.SaveChanges(HttpContext);
             return Ok(ToDto(dbProduct));
         }
 
@@ -70,7 +70,7 @@ namespace ProductsAPI.ProductManagement
                 return NotFound($"Product with ID {id} not found");
 
             productDBContext.Product.Remove(dbProduct);
-            productDBContext.SaveChanges();
+            productDBContext.SaveChanges(HttpContext);
             return Ok(ToDto(dbProduct));
         }
 

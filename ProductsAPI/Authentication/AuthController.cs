@@ -59,7 +59,7 @@ namespace ProductsAPI.Authentication
                 Hash = hashingService.Hash(user.Password)
             };
             dbContext.Users.Add(dbUser);
-            dbContext.SaveChanges();
+            dbContext.SaveChanges(HttpContext);
         }
 
         private DbObjects.User? GetValidUser(Dtos.User user)

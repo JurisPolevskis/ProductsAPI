@@ -9,6 +9,6 @@ namespace ProductsAPI.Database
         DbSet<User> Users { get; set; }
         DbSet<Product> Product { get; set; }
 
-        public int SaveChanges();
+        public int SaveChanges(HttpContext context);
     }
 }
