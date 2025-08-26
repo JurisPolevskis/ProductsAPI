@@ -15,7 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IVatService, VatService>();
+builder.Services.AddScoped<IVatService, VatService>(); 
+builder.Services.AddScoped<IProductValidationService, ProductValidationService>();
 builder.Services.AddDbContext<IProductDBContext, ProductDBContext>(options => options.UseSqlServer(builder.Configuration["connectionStrings:DatabaseConnection"]));
 
 ConfigureSwagger(builder);
