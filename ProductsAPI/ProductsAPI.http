@@ -1,6 +1,7 @@
 @ProductsAPI_HostAddress = http://localhost:5050
 
 GET {{ProductsAPI_HostAddress}}/weatherforecast/
+POST {{ProductsAPI_HostAddress}}/auth/create
 Accept: application/json
 
 ###
