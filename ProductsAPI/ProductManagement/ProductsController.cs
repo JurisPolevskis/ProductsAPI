@@ -18,7 +18,7 @@ namespace ProductsAPI.ProductManagement
 
         [HttpGet("products/{id}")]
         [Authorize(Policy = Policies.GetProducts)]
-        public IActionResult GetById([FromRoute] int? id)
+        public IActionResult GetById([FromRoute] int id)
         {
             var dbProduct = productDBContext.Product.FirstOrDefault(prod => prod.Id == id);
             if (dbProduct == null)
@@ -36,6 +36,27 @@ namespace ProductsAPI.ProductManagement
             }
             var dbProduct = ToDb(product);
             productDBContext.Product.Add(dbProduct);
+            productDBContext.SaveChanges();
+            return Created("products", ToDto(dbProduct));
+        }
+
+        [HttpPut("products/{id}")]
+        [Authorize(Policy = Policies.EditProducts)]
+        public IActionResult Put([FromRoute] int id, Dtos.Product product)
+        {
+            var dbProduct = productDBContext.Product.FirstOrDefault(prod => prod.Id == id);
+            if (dbProduct == null)
+                return NotFound($"Product with ID {id} not found");
+
+            if (!validationService.Validate(product, out string errorMessage))
+            {
+                return BadRequest(errorMessage);
+            }
+
+            dbProduct.Title = product.ItemName;
+            dbProduct.Quantity = product.Quantity;
+            dbProduct.Price = product.Price;
+
             productDBContext.SaveChanges();
             return Created("products", ToDto(dbProduct));
         }
