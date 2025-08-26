@@ -58,7 +58,20 @@ namespace ProductsAPI.ProductManagement
             dbProduct.Price = product.Price;
 
             productDBContext.SaveChanges();
-            return Created("products", ToDto(dbProduct));
+            return Ok(ToDto(dbProduct));
+        }
+
+        [HttpDelete("products/{id}")]
+        [Authorize(Policy = Policies.EditProducts)]
+        public IActionResult Delete([FromRoute] int id)
+        {
+            var dbProduct = productDBContext.Product.FirstOrDefault(prod => prod.Id == id);
+            if (dbProduct == null)
+                return NotFound($"Product with ID {id} not found");
+
+            productDBContext.Product.Remove(dbProduct);
+            productDBContext.SaveChanges();
+            return Ok(ToDto(dbProduct));
         }
 
         private IEnumerable<Dtos.Product> ToDto(IEnumerable<DbObjects.Product> dbProducts)
