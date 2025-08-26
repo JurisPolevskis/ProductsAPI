@@ -2,6 +2,8 @@
 
 GET {{ProductsAPI_HostAddress}}/weatherforecast/
 POST {{ProductsAPI_HostAddress}}/auth/create
+GET {{ProductsAPI_HostAddress}}/products
+GET {{ProductsAPI_HostAddress}}/products/{id}
 Accept: application/json
 
 ###

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using ProductsAPI.Authentication;
 using ProductsAPI.Authentication.Definitions;
 using ProductsAPI.Database;
+using ProductsAPI.ProductManagement;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IVatService, VatService>();
 builder.Services.AddDbContext<IProductDBContext, ProductDBContext>(options => options.UseSqlServer(builder.Configuration["connectionStrings:DatabaseConnection"]));
 
 ConfigureSwagger(builder);

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductsAPI.Authentication.Definitions;
-using ProductsAPI.Controllers;
 using ProductsAPI.Database;
 
 namespace ProductsAPI.Authentication
