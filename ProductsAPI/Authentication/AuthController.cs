@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ProductsAPI.Authentication.Definitions;
 using ProductsAPI.Controllers;
 using ProductsAPI.Database;
 
@@ -12,6 +14,7 @@ namespace ProductsAPI.Authentication
         private readonly IProductDBContext dbContext = dbContext;
 
         [HttpPost("create")]
+        [Authorize(Policy = Policies.UserManagement)]
         public IActionResult Create(Dtos.User user)
         {
             if (!UsernameValid(user.Username))

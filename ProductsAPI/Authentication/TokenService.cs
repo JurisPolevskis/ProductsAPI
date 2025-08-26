@@ -38,7 +38,10 @@ namespace ProductsAPI.Authentication
             var ci = new ClaimsIdentity();
 
             ci.AddClaim(new Claim(ClaimTypes.Name, user.Username));
-            ci.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+            if (user.Role is not null)
+            {
+                ci.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+            }
 
             return ci;
         }
