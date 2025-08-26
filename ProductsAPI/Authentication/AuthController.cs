@@ -33,6 +33,7 @@ namespace ProductsAPI.Authentication
             return Created("auth/create", user);
         }
 
+
         private static bool PasswordValid(string? password)
         {
             return !string.IsNullOrEmpty(password);
